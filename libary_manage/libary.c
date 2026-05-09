@@ -27,10 +27,24 @@ typedef struct Pile
 
 } Pile;
 
+/*================ STRUCTURE DEMANDE ================*/
+
+typedef struct Demande
+{
+    char nomLecteur[30];
+    char prenomLecteur[30];
+    int codeLivre;
+
+    struct Demande *suivant;
+
+} Demande;
+
 /*================ DECLARATION GLOBALE ================*/
 
 Livre *L = NULL;
 Pile *P = NULL;
+Demande *F = NULL;
+Demande *Q = NULL;
 
 /*================ AJOUTER LIVRE ================*/
 
@@ -275,6 +289,206 @@ void afficherLivres(Livre *L)
     }
 }
 
+/*================ AFFICHER LIVRES DISPONIBLES ================*/
+
+void afficherDisponibles(Livre *L)
+{
+    Livre *tmp;
+    int trouve = 0;
+
+    if (L == NULL)
+    {
+        printf("\nListe vide\n");
+        return;
+    }
+
+    printf("\n====== LIVRES DISPONIBLES ======\n");
+
+    tmp = L;
+
+    while (tmp != NULL)
+    {
+        if (tmp->disponible == 1)
+        {
+            printf("\nCode   : %d\n", tmp->code);
+            printf("Titre  : %s\n", tmp->titre);
+            printf("Auteur : %s\n", tmp->auteur);
+            printf("Annee  : %d\n", tmp->annee);
+            trouve = 1;
+        }
+
+        tmp = tmp->suivant;
+    }
+
+    if (trouve == 0)
+        printf("Aucun livre disponible\n");
+
+    printf("================================\n");
+}
+
+/*================ TRIER PAR ANNEE (TRI A BULLES) ================*/
+
+void trierParAnnee(Livre *L)
+{
+    Livre *tmp; // parcourir la liste
+    Livre temp;
+    int echange;
+
+    if (L == NULL || L->suivant == NULL)
+    {
+        printf("\nListe trop courte pour trier\n");
+        return;
+    }
+
+    do
+    {
+        echange = 0;
+        tmp = L;
+
+        while (tmp->suivant != NULL)
+        {
+            if (tmp->annee > tmp->suivant->annee)
+            {
+                /* echanger le contenu des deux noeuds */
+                temp = *tmp;
+                *tmp = *tmp->suivant;
+                *tmp->suivant = temp;
+
+                /* restaurer les pointeurs suivant (ils ne doivent pas etre echanges) */
+                tmp->suivant->suivant = tmp->suivant->suivant;
+
+                echange = 1;
+            }
+
+            tmp = tmp->suivant;
+        }
+
+    } while (echange);
+
+    printf("\nLivres tries par annee\n");
+
+    afficherLivres(L);
+}
+
+/*================ ENFILER DEMANDE ================*/
+
+void enfilerDemande()
+{
+    Demande *nv;
+
+    nv = (Demande *)malloc(sizeof(Demande));
+
+    printf("Nom du lecteur    : ");
+    scanf(" %[^\n]", nv->nomLecteur);
+
+    printf("Prenom du lecteur : ");
+    scanf(" %[^\n]", nv->prenomLecteur);
+
+    printf("Code du livre     : ");
+    scanf("%d", &nv->codeLivre);
+
+    nv->suivant = NULL;
+
+    if (F == NULL)
+    {
+        F = nv;
+        Q = nv;
+    }
+    else
+    {
+        Q->suivant = nv;
+        Q = nv;
+    }
+
+    printf("\nDemande de %s %s ajoutee\n", nv->prenomLecteur, nv->nomLecteur);
+}
+
+/*================ AFFICHER DEMANDES ================*/
+
+void afficherDemandes()
+{
+    Demande *tmp;
+    int i = 1;
+
+    if (F == NULL)
+    {
+        printf("\nAucune demande en attente\n");
+        return;
+    }
+
+    printf("\n====== DEMANDES EN ATTENTE ======\n");
+
+    tmp = F;
+
+    while (tmp != NULL)
+    {
+        printf("\n[%d] %s %s - Livre code %d\n",
+               i, tmp->prenomLecteur, tmp->nomLecteur, tmp->codeLivre);
+
+        tmp = tmp->suivant;
+        i++;
+    }
+
+    printf("=================================\n");
+}
+
+/*================ TRAITER DEMANDE ================*/
+
+Livre *traiterDemande(Livre *L)
+{
+    Demande *tmpFile;
+    Livre *tmp;
+    int code;
+
+    if (F == NULL)
+    {
+        printf("\nAucune demande a traiter\n");
+        return L;
+    }
+
+    /* recuperer la premiere demande (tete de file) */
+    tmpFile = F;
+    code = tmpFile->codeLivre;
+
+    printf("\nTraitement de la demande de %s %s (livre code %d)...\n",
+           tmpFile->prenomLecteur, tmpFile->nomLecteur, code);
+
+    /* retirer la tete de la file */
+    F = F->suivant;
+
+    if (F == NULL)
+        Q = NULL; /* file maintenant vide */
+
+    free(tmpFile);
+
+    /* chercher le livre dans la liste */
+    tmp = L;
+
+    while (tmp != NULL)
+    {
+        if (tmp->code == code)
+        {
+            if (tmp->disponible == 1)
+            {
+                tmp->disponible = 0;
+                printf("Demande ACCEPTEE : \"%s\" est maintenant emprunte\n", tmp->titre);
+            }
+            else
+            {
+                printf("Demande REJETEE : \"%s\" est deja emprunte\n", tmp->titre);
+            }
+
+            return L;
+        }
+
+        tmp = tmp->suivant;
+    }
+
+    printf("Demande REJETEE : livre code %d introuvable\n", code);
+
+    return L;
+}
+
 /*================ MENU ================*/
 
 int main()
@@ -291,7 +505,13 @@ int main()
         printf("4. Supprimer livre\n");
         printf("5. Restaurer livre\n");
         printf("6. Modifier livre\n");
-        printf("7. Quitter\n");
+        printf(" 7.  Afficher les livres disponibles\n");
+        printf(" 8.  Trier les livres par annee\n");
+        printf(" 9.  Ajouter une demande d'emprunt\n");
+        printf("10.  Afficher les demandes d'emprunt\n");
+        printf("11.  Traiter une demande d'emprunt\n");
+        printf("12.  Quitter le programme\n");
+        printf("===================================\n");
 
         printf("\nChoix : ");
         scanf("%d", &choix);
@@ -323,14 +543,34 @@ int main()
             break;
 
         case 7:
-            printf("\nFin programme\n");
+            afficherDisponibles(L);
+            break;
+
+        case 8:
+            trierParAnnee(L);
+            break;
+
+        case 9:
+            enfilerDemande();
+            break;
+
+        case 10:
+            afficherDemandes();
+            break;
+
+        case 11:
+            L = traiterDemande(L);
+            break;
+
+        case 12:
+            printf("\nFin du programme\n");
             break;
 
         default:
             printf("\nChoix invalide\n");
         }
 
-    } while (choix != 7);
+    } while (choix != 12);
 
     return 0;
 }
