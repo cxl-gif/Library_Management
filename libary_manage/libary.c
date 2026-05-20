@@ -70,7 +70,7 @@ Livre *ajouterLivre(Livre *L)
     printf("Annee : ");
     scanf("%d", &nv->annee);
 
-    // est ce qu'il exicte ou no
+   
     nv->disponible = 1;
     nv->suivant = NULL;
 
@@ -296,7 +296,6 @@ void afficherLivres(Livre *L)
     }
 }
 
-/*================ AFFICHER LIVRES DISPONIBLES ================*/
 
 void afficherDisponibles(Livre *L)
 {
@@ -333,8 +332,6 @@ void afficherDisponibles(Livre *L)
     printf("================================\n");
 }
 
-/*================ TRIER PAR ANNEE (TRI A BULLES) ================*/
-
 void trierParAnnee(Livre *L)
 {
     Livre *tmp; // parcourir la liste
@@ -356,13 +353,10 @@ void trierParAnnee(Livre *L)
         {
             if (tmp->annee > tmp->suivant->annee)
             {
-                /* echanger le contenu des deux noeuds */
+                /* hna kan  echanger le contenu des 2 noeuds */
                 temp = *tmp;
                 *tmp = *tmp->suivant;
                 *tmp->suivant = temp;
-
-                /* restaurer les pointeurs suivant (ils ne doivent pas etre echanges) */
-                tmp->suivant->suivant = tmp->suivant->suivant;
 
                 echange = 1;
             }
@@ -376,8 +370,6 @@ void trierParAnnee(Livre *L)
 
     afficherLivres(L);
 }
-
-/*================ ENFILER DEMANDE ================*/
 
 void enfilerDemande()
 {
@@ -410,8 +402,6 @@ void enfilerDemande()
     printf("\nDemande de %s %s ajoutee\n", nv->prenomLecteur, nv->nomLecteur);
 }
 
-/*================ AFFICHER DEMANDES ================*/
-
 void afficherDemandes()
 {
     Demande *tmp;
@@ -439,8 +429,6 @@ void afficherDemandes()
     printf("=================================\n");
 }
 
-/*================ TRAITER DEMANDE ================*/
-
 Livre *traiterDemande(Livre *L)
 {
     Demande *tmpFile;
@@ -460,7 +448,7 @@ Livre *traiterDemande(Livre *L)
     printf("\nTraitement de la demande de %s %s (livre code %d)...\n",
            tmpFile->prenomLecteur, tmpFile->nomLecteur, code);
 
-    /* retirer la tete de la file */
+    /* kan red la tete dyal file howa le next */
     F = F->suivant;
 
     if (F == NULL)
@@ -495,8 +483,6 @@ Livre *traiterDemande(Livre *L)
 
     return L;
 }
-
-/*================ MENU ================*/
 
 int main()
 {
