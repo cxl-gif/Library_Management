@@ -413,9 +413,9 @@ void afficherDemandes()
         return;
     }
 
-    printf("\n====== DEMANDES EN ATTENTE ======\n");
+    printf("\n------ DEMANDES EN ATTENTE ---------\n");
 
-    tmp = F;
+    tmp = F; // kaymchi l first demande.
 
     while (tmp != NULL)
     {
@@ -426,7 +426,7 @@ void afficherDemandes()
         i++;
     }
 
-    printf("=================================\n");
+    printf("----------------------------------\n");
 }
 
 Livre *traiterDemande(Livre *L)
@@ -441,22 +441,22 @@ Livre *traiterDemande(Livre *L)
         return L;
     }
 
-    /* recuperer la premiere demande (tete de file) */
+    //recuperer la premiere demande (tete de file) 
     tmpFile = F;
     code = tmpFile->codeLivre;
 
     printf("\nTraitement de la demande de %s %s (livre code %d)...\n",
            tmpFile->prenomLecteur, tmpFile->nomLecteur, code);
 
-    /* kan red la tete dyal file howa le next */
+    //kan red la tete dyal file howa le next 
     F = F->suivant;
 
     if (F == NULL)
-        Q = NULL; /* file maintenant vide */
+        Q = NULL; //file maintenant vide 
 
     free(tmpFile);
 
-    /* chercher le livre dans la liste */
+    //chercher le livre dans la liste 
     tmp = L;
 
     while (tmp != NULL)
