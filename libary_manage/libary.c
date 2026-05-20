@@ -18,10 +18,9 @@ typedef struct Livre
 } Livre;
 
 /*================ STRUCTURE PILE ================*/
-
+// la pile pour la suppression des livres
 typedef struct Pile
 {
-
     Livre info;
     struct Pile *suivant;
 
@@ -41,9 +40,13 @@ typedef struct Demande
 
 /*================ DECLARATION GLOBALE ================*/
 
+// tete liste
 Livre *L = NULL;
+// sommet pile
 Pile *P = NULL;
+// tete file
 Demande *F = NULL;
+// queue file
 Demande *Q = NULL;
 
 /*================ AJOUTER LIVRE ================*/
@@ -56,10 +59,10 @@ Livre *ajouterLivre(Livre *L)
     nv = (Livre *)malloc(sizeof(Livre));
 
     printf("Titre : ");
-    scanf(" %[^\n]", nv->titre);
+    scanf(" %[ ^\n]s", nv->titre);
 
     printf("Auteur : ");
-    scanf(" %[^\n]", nv->auteur);
+    scanf(" %[ ^\n]s", nv->auteur);
 
     printf("Code : ");
     scanf("%d", &nv->code);
@@ -67,6 +70,7 @@ Livre *ajouterLivre(Livre *L)
     printf("Annee : ");
     scanf("%d", &nv->annee);
 
+    // est ce qu'il exicte ou no
     nv->disponible = 1;
     nv->suivant = NULL;
 
@@ -122,18 +126,18 @@ void rechercherLivre(Livre *L)
 }
 
 /*================ EMPILER ================*/
-
+// ajoute un livre dans un pile
 Pile *empiler(Pile *P, Livre x)
 {
-    Pile *nv;
+    Pile *nvpile;
 
-    nv = (Pile *)malloc(sizeof(Pile));
+    nvpile = (Pile *)malloc(sizeof(Pile));
 
-    nv->info = x;
+    nvpile->info = x;
 
-    nv->suivant = P;
+    nvpile->suivant = P;
 
-    P = nv;
+    P = nvpile;
 
     return P;
 }
@@ -153,16 +157,16 @@ Livre *supprimerLivre(Livre *L)
     tmp = L;
     prec = NULL;
 
-    while (tmp != NULL && tmp->code != code)
-    {
-        prec = tmp;
-        tmp = tmp->suivant;
-    }
-
     if (tmp == NULL)
     {
         printf("\nLivre non trouve\n");
         return L;
+    }
+
+    while (tmp != NULL && tmp->code != code)
+    {
+        prec = tmp;
+        tmp = tmp->suivant;
     }
 
     /* sauvegarder dans pile */
@@ -171,13 +175,16 @@ Livre *supprimerLivre(Livre *L)
 
     /* suppression */
 
+    // si element veut supp est le premiere elm
     if (prec == NULL)
     {
+
         L = tmp->suivant;
     }
 
     else
     {
+        // precedent ghaywli ypointer 3la element suiv dyl lcourant
         prec->suivant = tmp->suivant;
     }
 
@@ -190,7 +197,7 @@ Livre *supprimerLivre(Livre *L)
 
 /*================ RESTAURER ================*/
 
-Livre *restaurerLivre(Livre *L)
+Livre *restaurerLivre(Livre *L, Pile *P)
 {
     Pile *tmpPile;
     Livre *nv;
